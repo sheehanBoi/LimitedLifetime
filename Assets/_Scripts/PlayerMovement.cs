@@ -36,9 +36,4 @@ public class PlayerMovement : MonoBehaviour
     {
         rb.linearVelocity = moveInput * moveSpeed;
     }
-
-    private void Attack()
-    {
-
-    }
 }
