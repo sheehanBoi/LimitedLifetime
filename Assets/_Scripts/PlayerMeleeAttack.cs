@@ -6,6 +6,7 @@ public class PlayerMeleeAttack : MonoBehaviour
     public Transform attackOrigin;
     public Vector2 attackSize = new Vector2(1f, 1f);
     public LayerMask enemyLayer;
+    private Animator animator;
 
     float attackDuration = 0.2f;
     bool isAttacking = false;
@@ -14,6 +15,7 @@ public class PlayerMeleeAttack : MonoBehaviour
     void Start()
     {
         //attackHitbox.SetActive(false);
+        animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -32,8 +34,7 @@ public class PlayerMeleeAttack : MonoBehaviour
         UpdateHitboxDirection();
 
         if (Input.GetKeyDown(KeyCode.Space) && !isAttacking)
-        {
-            
+        {            
             StartCoroutine(PerformAttack());
         }
     }
@@ -53,6 +54,12 @@ public class PlayerMeleeAttack : MonoBehaviour
     {
         isAttacking = true;
 
+        animator.SetFloat("LastMoveX", lastMoveDir.x);
+        animator.SetFloat("LastMoveY", lastMoveDir.y);
+        animator.SetBool("IsAttacking", true);
+        Debug.Log("Attacking");
+        //animator.SetTrigger("Attack");
+
         Collider2D[] hits = Physics2D.OverlapBoxAll(attackOrigin.position, attackSize, 0f, enemyLayer);
 
         foreach(Collider2D hit in hits)
@@ -60,12 +67,13 @@ public class PlayerMeleeAttack : MonoBehaviour
             Enemy enemy = hit.GetComponent<Enemy>();
             if (enemy != null)
             {
-                Debug.Log("Attacking");
+                Debug.Log("Hit Enemy");
                 enemy.TakeDamage(1);
             }
         }
 
         yield return new WaitForSeconds(attackDuration);
+        animator.SetBool("IsAttacking", false);
         isAttacking = false;
     }
 
